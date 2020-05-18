@@ -1,0 +1,75 @@
+# depslib dependency file v1.0
+1575972029 source:c:\users\kiril\documents\c\differentiator\main.cpp
+	<assert.h>
+	<cstring>
+	<iostream>
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<windows.h>
+	"differentiator.h"
+
+1576413990 source:c:\users\kiril\documents\c\differentiator\algebra.cpp
+	<assert.h>
+	<cstring>
+	<iostream>
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<windows.h>
+	"differentiator.h"
+
+1575739781 c:\users\kiril\documents\c\differentiator\algebra.h
+
+1575901260 source:c:\users\kiril\documents\c\differentiator\matan.cpp
+	<assert.h>
+	<cstring>
+	<iostream>
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<windows.h>
+	"differentiator.h"
+
+1576436922 source:c:\users\kiril\documents\c\differentiator\parcer.cpp
+	<assert.h>
+	<cstring>
+	<iostream>
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<windows.h>
+	"differentiator.h"
+
+1575976078 source:c:\users\kiril\documents\c\differentiator\application.cpp
+	<assert.h>
+	<cstring>
+	<iostream>
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<windows.h>
+	"differentiator.h"
+
+1575900314 c:\users\kiril\documents\c\differentiator\differentiator.h
+
+1575975841 source:c:\users\kiril\documents\c\differentiator\mti.cpp
+	<assert.h>
+	<cstring>
+	<iostream>
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<windows.h>
+	"differentiator.h"
+
+1575901600 source:c:\users\kiril\documents\c\differentiator\derrivate_of_operators.cpp
+	<assert.h>
+	<cstring>
+	<iostream>
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<windows.h>
+	"differentiator.h"
+

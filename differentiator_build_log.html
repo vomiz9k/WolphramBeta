@@ -1,0 +1,88 @@
+<html>
+<head>
+<title>differentiator build log</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head>
+<body>
+<tt>
+Build started on: <u>17-12-2019 at 01:40.49</u><br />
+Build ended on: <u>17-12-2019 at 01:40.52</u><p />
+<b>-------------- Build: Debug in differentiator (compiler: GNU GCC Compiler)---------------</b><br />
+mingw32-g++.exe -Wall -fexceptions  -g     -c C:\Users\kiril\Documents\c\differentiator\application.cpp -o obj\Debug\application.o<br />
+mingw32-g++.exe -Wall -fexceptions  -g     -c C:\Users\kiril\Documents\c\differentiator\parcer.cpp -o obj\Debug\parcer.o<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:235:20: warning: invalid suffix on literal; C++11 requires a space between literal and identifier [-Wliteral-suffix]</font><br />
+     fprintf(latex, "\\maketitle А потом подставляет свой %c = "AFTER_ZERO_ACCURACY"\\\\\n", variable, var_vals[variable - 'a']);<br />
+                    ^<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:239:24: warning: invalid suffix on literal; C++11 requires a space between literal and identifier [-Wliteral-suffix]</font><br />
+         fprintf(latex, "f^{(%d)}("AFTER_ZERO_ACCURACY") = %lf", i, var_vals[variable - 'a'], value);<br />
+                        ^<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:253:28: warning: invalid suffix on literal; C++11 requires a space between literal and identifier [-Wliteral-suffix]</font><br />
+             fprintf(latex, " + \\frac{"AFTER_ZERO_ACCURACY"}{%d!} \\cdot %c^%d", macloren[i], i, variable, i);<br />
+                            ^<br />
+C:\Users\kiril\Documents\c\differentiator\application.cpp: In function 'int working_with_func(char*)':<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\application.cpp:105:1: warning: control reaches end of non-void function [-Wreturn-type]</font><br />
+ }<br />
+ ^<br />
+C:\Users\kiril\Documents\c\differentiator\parcer.cpp: In function 'int latex_maker(tree_branch*, char, int, double*)':<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:243:25: warning: unknown escape sequence: '\m' [enabled by default]</font><br />
+         fprintf(latex,  "\\\maketitle Ну и ничего у него не получается, так как не по правилам живет.\\\\\n");<br />
+                         ^<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:245:21: warning: unknown escape sequence: '\m' [enabled by default]</font><br />
+     fprintf(latex,  "\\\maketitle А потом Стасян берет и раскладывается по Маклорену:\\\\\n");<br />
+                     ^<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:267:39: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]</font><br />
+     tree_print(next_derr, "goutput.gv");<br />
+                                       ^<br />
+C:\Users\kiril\Documents\c\differentiator\parcer.cpp: In function 'int tree_txt(tree_branch*, FILE*)':<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:331:19: warning: statement has no effect [-Wunused-value]</font><br />
+             for (i; i &lt; branch-&gt;kids; ++i)<br />
+                   ^<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:411:1: warning: no return statement in function returning non-void [-Wreturn-type]</font><br />
+ }<br />
+ ^<br />
+C:\Users\kiril\Documents\c\differentiator\parcer.cpp: In function 'void tree_print(tree_branch*, char*)':<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:449:81: warning: format '%x' expects argument of type 'unsigned int', but argument 3 has type 'tree_branch*' [-Wformat=]</font><br />
+         fprintf(fout, "\"box%0x\" [label=\"%c\"];\n", head, *(char*)(head-&gt;data));<br />
+                                                                                 ^<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:452:104: warning: format '%x' expects argument of type 'unsigned int', but argument 3 has type 'tree_branch*' [-Wformat=]</font><br />
+         fprintf(fout, "\"box%0x\" [label=\"" AFTER_ZERO_ACCURACY "\"];\n", head, *(double*)(head-&gt;data));<br />
+                                                                                                        ^<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:455:97: warning: format '%x' expects argument of type 'unsigned int', but argument 3 has type 'tree_branch*' [-Wformat=]</font><br />
+         fprintf(fout, "\"box%0x\" [label=\"%s\"];\n", head, ((tree_function*)(head-&gt;data))-&gt;name);<br />
+                                                                                                 ^<br />
+C:\Users\kiril\Documents\c\differentiator\parcer.cpp: In function 'void recursive_tree_print(tree_branch*, FILE*)':<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:484:109: warning: format '%x' expects argument of type 'unsigned int', but argument 3 has type 'tree_branch*' [-Wformat=]</font><br />
+                 fprintf(fout, "\"box%0x\" [label=\"%s\"];\n", branch, ((tree_function*)(branch-&gt;data))-&gt;name);<br />
+                                                                                                             ^<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:487:134: warning: format '%x' expects argument of type 'unsigned int', but argument 3 has type 'tree_branch*' [-Wformat=]</font><br />
+                 fprintf(fout, "\"box%0x\" [label=\"" AFTER_ZERO_ACCURACY "\"];\n", branch-&gt;next[k], *(double*)(branch-&gt;next[k]-&gt;data));<br />
+                                                                                                                                      ^<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:490:109: warning: format '%x' expects argument of type 'unsigned int', but argument 3 has type 'tree_branch*' [-Wformat=]</font><br />
+                 fprintf(fout, "\"box%0x\" [label=\"%c\"];\n", branch-&gt;next[k], *(char*)branch-&gt;next[k]-&gt;data);<br />
+                                                                                                             ^<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:492:112: warning: format '%x' expects argument of type 'unsigned int', but argument 3 has type 'tree_branch*' [-Wformat=]</font><br />
+             fprintf(fout, "\"box%0x\" -&gt; \"box%0x\"[label=\"\", color=\"green\"];\n", branch, (branch-&gt;next)[k]);<br />
+                                                                                                                ^<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:492:112: warning: format '%x' expects argument of type 'unsigned int', but argument 4 has type 'tree_branch*' [-Wformat=]</font><br />
+C:\Users\kiril\Documents\c\differentiator\parcer.cpp: In function 'tree_branch* get_N()':<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:673:24: warning: suggest parentheses around '&amp;&amp;' within '||' [-Wparentheses]</font><br />
+     if('a' &lt;= *SRC_STR &amp;&amp; *SRC_STR &lt;= 'z' || 'A' &lt;= *SRC_STR &amp;&amp; *SRC_STR &lt;= 'Z')<br />
+                        ^<br />
+C:\Users\kiril\Documents\c\differentiator\parcer.cpp: In function 'void get_calc_string(char*)':<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:699:25: warning: value computed is not used [-Wunused-value]</font><br />
+             *local_str++;<br />
+                         ^<br />
+C:\Users\kiril\Documents\c\differentiator\parcer.cpp: In function 'int latex_maker(tree_branch*, char, int, double*)':<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:268:1: warning: control reaches end of non-void function [-Wreturn-type]</font><br />
+ }<br />
+ ^<br />
+C:\Users\kiril\Documents\c\differentiator\parcer.cpp: In function 'int get_priority(tree_branch*)':<br />
+<font color="#0000ff">C:\Users\kiril\Documents\c\differentiator\parcer.cpp:436:1: warning: control reaches end of non-void function [-Wreturn-type]</font><br />
+ }<br />
+ ^<br />
+mingw32-g++.exe  -o bin\Debug\differentiator.exe obj\Debug\algebra.o obj\Debug\application.o obj\Debug\derrivate_of_operators.o obj\Debug\main.o obj\Debug\matan.o obj\Debug\mti.o obj\Debug\parcer.o<br />
+Output size is 1,58 MB<br />
+<font color="#0000ff">Process terminated with status 0 (0 minutes, 2 seconds)</font><br />
+<font color="#0000ff">0 errors, 21 warnings (0 minutes, 2 seconds)</font><br />
+</tt>
+</body>
+</html>

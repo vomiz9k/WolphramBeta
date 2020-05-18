@@ -1,0 +1,624 @@
+#include <assert.h>
+#include <cstring>
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <windows.h>
+
+double tree_count(tree_branch* branch, double* var_vals)
+{
+    double value = 0;
+    if (branch->type == TREE_OPERATOR)
+    {
+        if(*(char*)branch->data == '^')
+        {
+            int i = 0;
+
+            while(i < branch->kids && !branch->next[i])
+                i++;
+
+            value = tree_count(branch->next[i], var_vals);
+
+            for(i = i + 1; i < branch->kids; ++i)
+            {
+                if(branch->next[i])
+                    value = value_count(value, tree_count(branch->next[i], var_vals), *(char*)branch->data);
+            }
+            return value;
+        }
+        value = get_neutral_el(*(char*)branch->data);
+        for(int i = 1; i < branch->kids; ++i)
+        {
+            if(branch->next[i])
+                value = value_count(value, tree_count(branch->next[i], var_vals), *(char*)branch->data);
+        }
+
+        if(branch->next[0])
+            for(int i = 0; i < branch->next[0]->kids; ++i)
+            {
+                if(branch->next[0]->next[i])
+                    value = value_count(value, tree_count(branch->next[0]->next[i], var_vals), *(char*)branch->next[0]->data);
+            }
+
+        return value;
+    }
+    if (branch->type == TREE_INTEGER)
+    {
+        return *(double*)branch->data;
+    }
+
+    if (branch->type == TREE_VAR)
+    {
+        return var_vals[*(char*)branch->data - 'a'];
+    }
+
+    if (branch->type == TREE_FUNCTION)
+    {
+
+        double (*func)(double) = ((tree_function*)(branch->data))->ptr;
+        return func(tree_count(branch->next[0], var_vals));
+    }
+}
+
+
+int make_tree_easier(tree_branch* branch)
+{
+    double value = 0;
+    if (branch->type == TREE_OPERATOR)
+    {
+        if(*(char*)branch->data == '^')
+        {
+            int first_int_num = 0;
+
+            while (first_int_num < branch->kids && branch->next[first_int_num] && make_tree_easier(branch->next[first_int_num]) != TREE_INTEGER)
+                first_int_num++;
+
+            if (first_int_num == branch->kids)
+                return branch->type;
+
+            value = *(double*)branch->next[first_int_num]->data;
+            int int_count = 1;
+            int int_number = first_int_num;
+
+            for(int i = first_int_num + 1; i < branch->kids; ++i)
+            {
+                if (branch->next[i] && make_tree_easier(branch->next[i]) == TREE_INTEGER)
+                {
+                    if(int_number == i - 1)
+                    {
+                        branch_full_clr(branch->next[i - 1]);
+                        branch->next[i - 1] = 0;
+                        value = value_count(value, tree_count(branch->next[i], 0), *(char*)branch->data);
+                        *(double*)branch->next[i]->data = value;
+                        int_count++;
+                        int_number = i;
+                    }
+                    else
+                    {
+                        int_number = i;
+                        int_count++;
+                    }
+                }
+            }
+
+            if (int_count == branch->kids)
+            {
+                printf("here");
+                tree_branch* cache = branch->next[int_number];
+                free(branch->next);
+                free(branch->data);
+                branch->kids = 0;
+                branch->next = 0;
+                branch->data = cache->data;
+                branch->type = cache->type;
+
+            }
+            return branch->type;
+        }
+        double neutral_el = get_neutral_el(*(char*)branch->data);
+
+        int int_count = 0;
+        int int_number = -1;
+        value = neutral_el;
+
+        if(branch->next[0])
+        {
+            for(int i = 0; i < branch->next[0]->kids; ++i)
+            {
+                if (branch->next[0]->next[i] && make_tree_easier(branch->next[0]->next[i]) == TREE_INTEGER)
+                {
+                    value = value_count(value, tree_count(branch->next[0]->next[i], 0), *(char*)branch->next[0]->data);
+                    branch_full_clr(branch->next[0]->next[i]);
+                    branch->next[0]->next[i] = 0;
+                    int_count++;
+                    int_number = i;
+                }
+            }
+            if(int_number != -1)
+            {
+                branch->next[0]->next[int_number] = new_branch_construct();
+                branch->next[0]->next[int_number]->data = calloc(sizeof(double), 1);
+                *(double*)branch->next[0]->next[int_number]->data = value;
+                branch->next[0]->next[int_number]->type = TREE_INTEGER;
+            }
+
+        }
+        value = neutral_el;
+        int second_num = int_number;
+        int_number = 0;
+        for(int i = 1; i < branch->kids; ++i)
+        {
+            if(branch->next[i])
+                if (make_tree_easier(branch->next[i]) == TREE_INTEGER)
+                {
+                    value = value_count(value, tree_count(branch->next[i], 0), *(char*)branch->data);
+                    branch_full_clr(branch->next[i]);
+                    branch->next[i] = 0;
+                    int_count++;
+                    int_number = i;
+                }
+                else if (*(char*)branch->next[i]->data == *(char*)branch->data && branch->next[i]->type == TREE_OPERATOR)
+                {
+                    for(int j = 1; j < branch->next[i]->kids; ++j)
+                    {
+                        add_kid(branch);
+                        branch->next[branch->kids] = branch->next[i]->next[j];
+                        branch->kids++;
+                    }
+                    if (branch->next[i]->next[0])
+                        for(int j = 0; j < branch->next[i]->next[0]->kids; ++j)
+                        {
+                            add_kid(branch->next[0]);
+                            branch->next[0]->next[branch->next[0]->kids] = branch->next[i]->next[0]->next[j];
+                            branch->next[0]->kids++;
+                        }
+                    branch_clr(branch->next[i]);
+                    branch->next[i] = 0;
+                }
+        }
+        if(int_number != 0)
+        {
+            if (value == 0 && *(char*)branch->data == '*')
+            {
+                branch->type = TREE_INTEGER;
+                for(int i = 0; i < branch->kids; ++i)
+                {
+                    branch_full_clr(branch->next[i]);
+                    branch->next[i] = 0;
+                }
+                branch->data = calloc(sizeof(double), 1);
+                *(double*)branch->data = 0;
+                branch->kids = 0;
+
+                return TREE_INTEGER;
+            }
+
+            branch->next[int_number] = new_branch_construct();
+            branch->next[int_number]->data = calloc(sizeof(double), 1);
+            *(double*)(branch->next[int_number]->data) = value;
+            branch->next[int_number]->type = TREE_INTEGER;
+
+
+            int real_kids = 0;
+            tree_branch* last_kid = 0;
+
+            for(int i = 0; i < branch->kids; ++i)
+                if(branch->next[i])
+                {
+                    real_kids++;
+                    last_kid = branch->next[i];
+                }
+
+            if (real_kids == 1 && last_kid != 0)
+            {
+                for(int i = 0; i < branch->kids; ++i)
+                    if(branch->next[i] && branch->next[i] != last_kid)
+                        branch_full_clr(branch->next[i]);
+
+                branch->type = last_kid->type;
+                branch->data = last_kid->data;
+                branch->kids = last_kid->kids;
+                branch->next = last_kid->next;
+                return branch->type;
+            }
+        }
+        if(branch->next[0])
+        {
+            if(int_count == branch->kids + branch->next[0]->kids - 1)
+            {
+
+                value = value_count(*(double*)branch->next[int_number]->data, *(double*)branch->next[0]->next[second_num]->data, *(char*)branch->data);
+                branch_clr(branch->next[int_number]);
+                branch_full_clr(branch->next[0]);
+                branch->next[int_number] = 0;
+                branch->next[0] = 0;
+
+                branch->type = TREE_INTEGER;
+                free(branch->data);
+                branch->data = calloc(1, sizeof(double));
+                *(double*)branch->data = value;
+
+            }
+        }
+        else
+            if(int_count == branch->kids - 1)
+            {
+                branch_clr(branch->next[int_number]);
+                branch->next[int_number] = 0;
+                branch->type = TREE_INTEGER;
+                free(branch->data);
+                branch->data = calloc(1, sizeof(int));
+                *(int*)branch->data = value;
+//printf("value %d\n", value);
+            }
+
+    }
+    if(branch->type == TREE_FUNCTION)
+    {
+        if(make_tree_easier(branch->next[0]) == TREE_INTEGER)
+        {
+            tree_branch* cache = branch->next[0];
+
+            double (*func)(double) = ((tree_function*)(branch->data))->ptr;
+            branch->data = realloc(branch->data, sizeof(double));
+            *(double*)branch->data = func(*(double*)branch->next[0]->data);
+            branch->type = branch->next[0]->type;
+            branch->kids = 0;
+
+            branch_full_clr(branch->next[0]);
+            free(branch->next);
+
+            branch->next = 0;
+            return branch->type;
+        }
+
+    }
+    return branch->type;
+}
+
+double get_neutral_el(char operation)
+{
+    if(operation == '+' || operation == '-')
+        return 0;
+    if(operation == '*' || operation == '/')
+        return 1;
+
+    return -1;
+}
+
+int branch_full_clr(tree_branch* branch)
+{
+    if (branch)
+    {
+        for(int i = 0; i < branch->kids; ++i)
+            if(branch->next[i])
+                branch_full_clr(branch->next[i]);
+        branch_clr(branch);
+    }
+}
+
+double value_count(double value, double difference, char operation)
+{
+    switch (operation)
+    {
+        case '+':
+
+            return value + difference;
+
+        case '-':
+            return value - difference;
+
+        case '*':
+            return value * difference;
+
+        case '/':
+            if (difference == 0)
+            {
+                printf("ERROR!!! DIVISION BY ZERO!!!\n");
+                exit(0);
+            }
+            return value / difference;
+
+        case '^':
+            return pow(value, difference);
+    }
+}
+
+tree_branch* get_G(char* str)
+{
+    get_calc_string(str);
+    tree_branch* value = get_E();
+    printf("ASDASD %s\n", SRC_STR);
+    return value;
+}
+
+tree_branch* get_E()
+{
+    tree_branch* value = new_branch_construct();
+    value->data = calloc(sizeof(char), 1);
+    *(char*)value->data = '+';
+    value->type = TREE_OPERATOR;
+
+    add_kid(value);
+    value->next[0]->data = calloc(sizeof(char), 1);
+    *(char*)(value->next[0]->data) = '-';
+    value->next[0]->type = TREE_OPERATOR;
+    value->kids++;
+
+    add_kid(value);
+    value->next[value->kids] = get_T();
+    value->kids++;
+
+
+    while (*SRC_STR == '+' || *SRC_STR == '-')
+    {
+        char operation = *SRC_STR;
+        SRC_STR++;
+
+        tree_branch* next_value = get_T();
+
+        if (operation == '+')
+        {
+            add_kid(value);
+            value->next[value->kids] = next_value;
+            value->kids++;
+        }
+        else
+        {
+            add_kid(value->next[0]);
+            value->next[0]->next[value->next[0]->kids] = next_value;
+            value->next[0]->kids++;
+        }
+    }
+    if (value->next[0]->kids == 0)
+    {
+        branch_clr(value->next[0]);
+        value->next[0] = 0;
+        if (value->kids == 2)
+        {
+            tree_branch* cache = value->next[1];
+            branch_clr(value);
+            return cache;
+        }
+    }
+    return value;
+}
+
+tree_branch* get_T()
+{
+    tree_branch* value = new_branch_construct();
+    value->data = calloc(sizeof(char), 1);
+    *(char*)value->data = '*';
+    value->type = TREE_OPERATOR;
+
+    add_kid(value);
+    value->next[0]->data = calloc(sizeof(char), 1);
+    *(char*)(value->next[0]->data) = '/';
+    value->next[0]->type = TREE_OPERATOR;;
+    value->kids++;
+
+    add_kid(value);
+    value->next[value->kids] = get_C();
+    value->kids++;
+
+    while (*SRC_STR == '*' || *SRC_STR == '/')
+    {
+        char operation = *SRC_STR;
+        SRC_STR++;
+
+        tree_branch* next_value = get_C();
+
+        if (operation == '*')
+        {
+            add_kid(value);
+            value->next[value->kids] = next_value;
+            value->kids++;
+        }
+        else
+        {
+            add_kid(value->next[0]);
+            value->next[0]->next[value->next[0]->kids] = next_value;
+            value->next[0]->kids++;
+        }
+    }
+    if (value->next[0]->kids == 0)
+    {
+        branch_clr(value->next[0]);
+        value->next[0] = 0;
+        if (value->kids == 2)
+        {
+            tree_branch* cache = value->next[1];
+            branch_clr(value);
+            return cache;
+        }
+    }
+    return value;
+}
+
+tree_branch* get_C()
+{
+    tree_branch* value = new_branch_construct();
+    value->data = calloc(sizeof(char), 1);
+    *(char*)value->data = '^';
+    value->type = TREE_OPERATOR;
+
+    add_kid(value);
+    value->next[value->kids] = get_P();
+    value->kids++;
+
+    while (*SRC_STR == '^')
+    {
+        SRC_STR++;
+
+        tree_branch* next_value = get_P();
+
+        add_kid(value);
+        value->next[value->kids] = next_value;
+        value->kids++;
+    }
+
+    if (value->kids == 1)
+    {
+        tree_branch* cache = value->next[0];
+        branch_clr(value);
+        return cache;
+    }
+
+    return value;
+}
+
+tree_branch* get_P()
+{
+    if (*SRC_STR == '(')
+    {
+        SRC_STR++;
+        tree_branch* value = get_E();
+        assert(*SRC_STR == ')');
+        SRC_STR++;
+        return value;
+    }
+    return get_N();
+}
+
+tree_branch* get_N()
+{
+    for(int i = 0; i < FUNCTIONS_COUNT; i++)
+        if (strstr(SRC_STR, FUNCTIONS[i].name) == SRC_STR)
+        {
+            tree_branch* branch = new_branch_construct();
+            branch->data = calloc(1, sizeof(tree_function));
+            *(tree_function*)branch->data = FUNCTIONS[i];
+            SRC_STR += strlen(FUNCTIONS[i].name);
+            branch->type = TREE_FUNCTION;
+
+            add_kid(branch);
+            branch->kids++;
+
+            branch->next[0] = get_P();
+
+            return branch;
+
+        }
+
+
+    if('a' <= *SRC_STR && *SRC_STR <= 'z')
+    {
+        tree_branch* branch = new_branch_construct();
+        branch->data = calloc(1, sizeof(char));
+        *(char*)branch->data = *SRC_STR;
+        SRC_STR++;
+        branch->type = TREE_VAR;
+        return branch;
+    }
+    double value = 0;
+    int str_add = 0;
+    sscanf(SRC_STR, "%lf%n", &value, &str_add);
+
+    SRC_STR += str_add;
+    tree_branch* branch = new_branch_construct();
+    branch->data = calloc(1, sizeof(double));
+    *(double*)branch->data = value;
+    branch->type = TREE_INTEGER;
+    return branch;
+}
+
+void get_calc_string(char* str)
+{
+    SRC_STR = (char*) calloc(sizeof(char), strlen(str) + 1);
+    char* local_str = SRC_STR;
+    for (int i = 0; str[i] != 0; i++)
+    {
+        if (str[i] != ' ' && str[i] != '\n' && str[i] != ' ' && str[i] != 0)
+        {
+            *local_str = str[i];
+            *local_str++;
+        }
+    }
+
+}
+
+
+tree_branch* new_branch_construct()
+{
+    tree_branch* brunch = (tree_branch*) calloc(sizeof(tree_branch), 1);
+    assert(brunch);
+
+    brunch->type = -1;
+    brunch->kids = 0;
+
+    return brunch;
+}
+
+void add_kid(tree_branch* branch)
+{
+    assert(branch);
+    branch->next = (tree_branch**)realloc(branch->next, sizeof(tree_branch*) * (branch->kids + 1));
+    assert(branch->next);
+    branch->next[branch->kids] = new_branch_construct();
+    assert(branch->next && branch->next[branch->kids]);
+}
+
+void branch_clr(tree_branch* branch)
+{
+    free(branch->data);
+    free(branch->next);
+    free(branch);
+}
+
+void tree_print(tree_branch* head, char* fout_name)
+{
+    assert(head && fout_name);
+    FILE* fout = fopen(fout_name, "w");
+    assert(fout);
+    fprintf(fout, "digraph First{\n");
+
+    fprintf(fout, "node [fontname=\"Lobster\", shape=\"Mrecord\", style=\"filled\", fillcolor=\"lightblue\"];");
+    if (head->type == TREE_OPERATOR || head->type == TREE_VAR)
+        fprintf(fout, "\"box%0x\" [label=\"%c\"];\n", head, *(char*)(head->data));
+
+    if (head->type == TREE_INTEGER)
+        fprintf(fout, "\"box%0x\" [label=\""AFTER_ZERO_ACCURACY"\"];\n", head, *(double*)(head->data));
+
+    if (head->type == TREE_FUNCTION)
+        fprintf(fout, "\"box%0x\" [label=\"%s\"];\n", head, ((tree_function*)(head->data))->name);
+
+    recursive_tree_print(head, fout);
+
+    fprintf(fout, "}");
+    fclose(fout);
+
+    system("dot -Tpng goutput.gv -o foutput.png");
+    system("foutput.png");
+}
+
+
+
+void recursive_tree_print (tree_branch* branch, FILE* fout)
+{
+    for (int i = branch->kids - 1; i >= 0; --i)
+    {
+        int k = 0;
+        if (branch->type == TREE_OPERATOR && *(char*)branch->data == '^')
+            k = branch->kids - i - 1;
+        else
+            k = i;
+
+        if (branch->next[k])
+        {
+
+            if (branch->type == TREE_FUNCTION)
+                fprintf(fout, "\"box%0x\" [label=\"%s\"];\n", branch, ((tree_function*)(branch->data))->name);
+
+            if (branch->next[k]->type == TREE_INTEGER)
+                fprintf(fout, "\"box%0x\" [label=\""AFTER_ZERO_ACCURACY"\"];\n", branch->next[k], *(double*)(branch->next[k]->data));
+
+            else
+                fprintf(fout, "\"box%0x\" [label=\"%c\"];\n", branch->next[k], *(char*)branch->next[k]->data);
+
+            fprintf(fout, "\"box%0x\" -> \"box%0x\"[label=\"\", color=\"green\"];\n", branch, (branch->next)[k]);
+            recursive_tree_print(branch->next[k], fout);
+        }
+    }
+}
+

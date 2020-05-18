@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<BrowseTracker_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="algebra.cpp" open="1" top="0" tabpos="9">
+		<Cursor position="12958" topLine="36" />
+		<Book_Marks positions="652,652" />
+	</File>
+	<File name="application.cpp" open="1" top="0" tabpos="12">
+		<Cursor position="3000" topLine="35" />
+		<BrowseMarks positions="" />
+		<Book_Marks positions="" />
+	</File>
+	<File name="differentiator.h" open="1" top="0" tabpos="10">
+		<Cursor position="1745" topLine="62" />
+	</File>
+	<File name="mti.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="332" topLine="158" />
+		<BrowseMarks positions="5615,10275" />
+	</File>
+	<File name="matan.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="1820" topLine="2" />
+		<BrowseMarks positions="1752" />
+	</File>
+	<File name="parcer.cpp" open="1" top="1" tabpos="11">
+		<Cursor position="9401" topLine="258" />
+		<BrowseMarks positions="" />
+		<Book_Marks positions="" />
+	</File>
+	<File name="main.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="187" topLine="2" />
+		<BrowseMarks positions="189,229" />
+		<Book_Marks positions="10191,10191,15229,15229,312" />
+	</File>
+	<File name="derrivate_of_operators.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="3718" topLine="0" />
+	</File>
+</BrowseTracker_layout_file>
